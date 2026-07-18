@@ -1,4 +1,4 @@
-# Vigil — Verification
+# Agentic Automated Triage for Splunk — Verification
 
 **Status: COMPLETE and verified end-to-end (2026-06-12).** One webhook POST produces a
 rich, boss-ready HTML incident-triage email in mailpit, with real Splunk-derived

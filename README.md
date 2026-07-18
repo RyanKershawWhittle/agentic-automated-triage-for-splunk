@@ -1,6 +1,6 @@
-# Vigil — Agentic Automated Incident Triage for Splunk
+# Agentic Automated Triage for Splunk
 
-Vigil is an **agentic** incident-triage pipeline for Splunk: a saved-search alert fires a
+This is an **agentic** incident-triage pipeline for Splunk: a saved-search alert fires a
 **webhook** → an **orchestrator** starts a Claude tool-use conversation → Claude
 autonomously drives a chain of **SPL investigation queries** through three MCP tools
 (search → populate-if-empty → re-search → email) → an AI-written triage report — severity,
@@ -69,7 +69,7 @@ Check: `docker ps` should show both. Python 3.12 on the host is only needed for 
 ## Quick start
 
 ```powershell
-cd vigil-agentic-triage
+cd agentic-automated-triage-for-splunk
 
 # 1. Prepare Splunk: mint tokens, create index + HEC + the webhook alert.
 #    Writes SPLUNK_API_TOKEN + SPLUNK_HEC_TOKEN into .env (created from .env.example).
