@@ -186,6 +186,29 @@ Runtime auth is **Bearer tokens only** — no `admin:password`, no Basic header,
 (`/services/auth/login`, a session key — not a Basic header) purely to *mint* the JWT
 auth token and HEC token; every subsequent call uses those tokens.
 
+## Guardrails
+
+The agent composes its own SPL at runtime, so it is never trusted to behave — it is
+*constrained*:
+
+- **Read-only SPL guard** (`triage/spl_guard.py`) — every agent-issued query passes
+  through a deny-by-default gate at the single Splunk choke point
+  (`splunk_client.run_search`) before it reaches the REST API. Commands that mutate
+  state or exfiltrate data (`delete`, `collect`, `outputlookup`, `sendemail`,
+  `script`, …) are blocked as *pipeline commands* — the literal word "delete"
+  appearing in log text still searches fine. Unit-tested offline in
+  `tests/test_spl_guard.py` (runs in CI).
+- **Bounded action surface** — the agent has exactly three tools (search, populate
+  test data, send email). It cannot touch Splunk config, users, or apps; the only
+  outbound side effect is the triage email, and in the lab that lands in mailpit,
+  not a real mailbox.
+- **Secrets stay in the environment** — API keys and tokens come from `.env`
+  (gitignored, `.env.example` is placeholders-only); nothing is hardcoded and
+  nothing is echoed into the report.
+- **Deterministic fallback** — with no `ANTHROPIC_API_KEY` set, the pipeline runs a
+  scripted mode that exercises the identical tool chain, so the guardrails are
+  testable without a live model.
+
 ## The MCP server on its own
 
 `triage/mcp_server.py` is a standalone MCP server you can point any MCP client at:

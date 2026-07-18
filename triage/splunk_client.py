@@ -13,6 +13,7 @@ import requests
 import urllib3
 
 from . import config
+from .spl_guard import check_spl
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -38,6 +39,7 @@ def run_search(
     timeout: int = 60,
 ) -> list[dict[str, Any]]:
     """Run a blocking oneshot search and return result rows as dicts."""
+    check_spl(spl)
     search = spl if spl.lstrip().startswith("|") else f"search {spl}"
     body = {
         "search": search,

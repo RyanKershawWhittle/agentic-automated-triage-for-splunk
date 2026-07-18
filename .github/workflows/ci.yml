@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Unit tests + syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt pytest
+      - name: SPL guardrail unit tests (offline)
+        run: pytest tests/test_spl_guard.py -v
+      - name: Compile all modules
+        run: python -m compileall triage/ scripts/ tests/
+      # tests/test_e2e.py needs a live Splunk + mailpit stack (docker compose up)
+      # and is run locally — see VERIFICATION.md for the recorded E2E evidence.
