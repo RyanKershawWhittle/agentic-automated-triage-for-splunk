@@ -1,4 +1,5 @@
 # Agentic Automated Triage for Splunk
+[![CI](https://github.com/RyanKershawWhittle/agentic-automated-triage-for-splunk/actions/workflows/ci.yml/badge.svg)](https://github.com/RyanKershawWhittle/agentic-automated-triage-for-splunk/actions/workflows/ci.yml)
 
 This is an **agentic** incident-triage pipeline for Splunk: a saved-search alert fires a
 **webhook** → an **orchestrator** starts a Claude tool-use conversation → Claude
