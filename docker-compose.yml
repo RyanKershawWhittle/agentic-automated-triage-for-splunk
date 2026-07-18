@@ -1,0 +1,50 @@
+# Alert-Triage pipeline.
+#
+# This compose brings up the two NEW services — the MCP server and the
+# webhook+orchestrator. They connect to infrastructure that already runs as
+# standalone dev containers:
+#   - splunk-dev  (Splunk Enterprise)  -> reached at host.docker.internal:8089 / :8088
+#   - mailpit     (test SMTP)          -> reached at host.docker.internal:1025, UI :8025
+#
+# Prereqs:  1) splunk-dev + mailpit running   2) `.env` populated (scripts/setup_splunk.py)
+# Bring up:  docker compose up --build
+
+services:
+  mcp-server:
+    build: .
+    image: alert-triage:latest
+    container_name: alert-triage-mcp
+    command: ["python", "-m", "triage.mcp_server"]
+    env_file: [.env]
+    environment:
+      SPLUNK_HOST: host.docker.internal
+      SMTP_HOST: host.docker.internal
+      MCP_TRANSPORT: sse
+    ports:
+      - "8050:8050"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # Linux; no-op on Docker Desktop
+    restart: unless-stopped
+
+  triage-app:
+    build: .
+    image: alert-triage:latest
+    container_name: alert-triage-app
+    command: ["python", "-m", "triage.webhook"]
+    env_file: [.env]
+    environment:
+      SPLUNK_HOST: host.docker.internal
+      SMTP_HOST: host.docker.internal
+      # Pass an API key from your shell if it isn't in .env:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    ports:
+      - "5001:5001"           # so splunk-dev can POST webhooks to host.docker.internal:5001
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on: [mcp-server]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:5001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped

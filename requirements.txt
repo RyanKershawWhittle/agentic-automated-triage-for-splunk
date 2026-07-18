@@ -1,0 +1,7 @@
+# Alert-triage pipeline — pinned-ish, dev-friendly ranges
+anthropic>=0.40,<1.0
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.29,<1.0
+requests>=2.31,<3.0
+python-dotenv>=1.0,<2.0
+mcp>=1.2,<2.0          # FastMCP (mcp.server.fastmcp) for the MCP server role
